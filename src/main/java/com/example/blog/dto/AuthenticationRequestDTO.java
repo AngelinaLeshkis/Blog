@@ -3,8 +3,9 @@ package com.example.blog.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
-public class AuthenticationRequestDTO {
+public class AuthenticationRequestDTO implements Serializable {
 
     @NotBlank(message = "Email is a required field")
     @Pattern(regexp = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")

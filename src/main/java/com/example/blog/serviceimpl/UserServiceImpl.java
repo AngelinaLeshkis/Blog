@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder,
                            ActivateUserAccountService activateUserAccountService) {
         this.userRepo = userRepo;
-        this.passwordEncoder = passwordEncoder;
+       this.passwordEncoder = passwordEncoder;
         this.activateUserAccountService = activateUserAccountService;
     }
 
