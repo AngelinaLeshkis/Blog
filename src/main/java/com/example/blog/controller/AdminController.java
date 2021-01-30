@@ -1,17 +1,19 @@
 package com.example.blog.controller;
 
-import com.example.blog.entity.User;
+import com.example.blog.dto.UserDTO;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/admin")
 public class AdminController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public AdminController(UserService userService) {
@@ -19,7 +21,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/users")
-    public Iterable<User> getUsers() {
+    public List<UserDTO> getUsers() {
         return userService.getUsers();
     }
 }

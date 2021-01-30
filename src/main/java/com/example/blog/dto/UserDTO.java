@@ -1,8 +1,10 @@
 package com.example.blog.dto;
 
+import com.example.blog.entity.Article;
 import com.example.blog.entity.User;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDTO implements Serializable {
 
@@ -10,16 +12,17 @@ public class UserDTO implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
+    private List<Article> articles;
 
-    public User toUser() {
-        User user = new User();
-        user.setId(id);
-        user.setEmail(email);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-
-        return user;
-    }
+//    public User toUser() {
+//        User user = new User();
+//        user.setId(id);
+//        user.setEmail(email);
+//        user.setFirstName(firstName);
+//        user.setLastName(lastName);
+//
+//        return user;
+//    }
 
     public static UserDTO fromUser(User user) {
         UserDTO userDTO = new UserDTO();
@@ -27,9 +30,21 @@ public class UserDTO implements Serializable {
         userDTO.setEmail(user.getEmail());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
+        userDTO.setArticles(user.getArticles());
 
         return userDTO;
     }
+
+//    public static UserDTO fromDBUser(User user) {
+//        UserDTO userDTO = new UserDTO();
+//        userDTO.setId(user.getId());
+//        userDTO.setEmail(user.getEmail());
+//        userDTO.setFirstName(user.getFirstName());
+//        userDTO.setLastName(user.getLastName());
+//        userDTO.setArticles(user.getArticles());
+//
+//        return userDTO;
+//    }
 
     public Long getId() {
         return id;
@@ -61,5 +76,13 @@ public class UserDTO implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
     }
 }

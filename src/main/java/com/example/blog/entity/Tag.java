@@ -1,5 +1,8 @@
 package com.example.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -35,6 +38,7 @@ public class Tag {
         this.name = name;
     }
 
+    @JsonIgnore
     public Set<Article> getArticles() {
         return articles;
     }

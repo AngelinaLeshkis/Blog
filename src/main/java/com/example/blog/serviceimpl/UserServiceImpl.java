@@ -1,28 +1,30 @@
 package com.example.blog.serviceimpl;
 
 import com.example.blog.dto.AuthenticationRequestDTO;
+import com.example.blog.dto.UserDTO;
 import com.example.blog.entity.Role;
 import com.example.blog.entity.User;
 import com.example.blog.persistence.UserRepository;
-import com.example.blog.service.ActivateUserAccountService;
+import com.example.blog.security.JwtUser;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepo;
-    private PasswordEncoder passwordEncoder;
-    private ActivateUserAccountService activateUserAccountService;
+    private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder,
-                           ActivateUserAccountService activateUserAccountService) {
+    public UserServiceImpl(UserRepository userRepo, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
-       this.passwordEncoder = passwordEncoder;
-        this.activateUserAccountService = activateUserAccountService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -35,21 +37,15 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User registeredUser = userRepo.save(user);
-        String token = activateUserAccountService.createVerificationTokenForUser(registeredUser);
-        activateUserAccountService.sendEmailToConfirmRegistration(token, registeredUser);
 
-        return registeredUser;
+        return userRepo.save(user);
     }
 
     @Override
-    public void updateUser(User user) {
-        userRepo.save(user);
-    }
-
-    @Override
-    public Iterable<User> getUsers() {
-        return userRepo.findAll();
+    public List<UserDTO> getUsers() {
+        return userRepo.findAll().stream()
+                .map(UserDTO::fromUser)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -67,7 +63,7 @@ public class UserServiceImpl implements UserService {
     public User setNewPassword(AuthenticationRequestDTO authenticationRequestDTO) {
         User userFromDB = userRepo.findUserByEmail(authenticationRequestDTO.getEmail());
 
-        if (userFromDB != null) {
+        if (userFromDB == null) {
             return null;
         }
 
@@ -75,5 +71,12 @@ public class UserServiceImpl implements UserService {
         userRepo.save(userFromDB);
 
         return userFromDB;
+    }
+
+    @Override
+    public Long getLoggedInUserId() {
+        JwtUser user = (JwtUser) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        return user.getId();
     }
 }

@@ -19,9 +19,9 @@ import java.util.Map;
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-    private AuthenticationManager authenticationManager;
-    private JwtTokenProvider jwtTokenProvider;
-    private UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Autowired
     public AuthorizationServiceImpl(AuthenticationManager authenticationManager,

@@ -1,14 +1,12 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.AuthenticationRequestDTO;
+import com.example.blog.service.ActivationService;
 import com.example.blog.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -16,11 +14,14 @@ import javax.validation.Valid;
 @RequestMapping(path = "/auth")
 public class AuthenticationController {
 
-    private AuthorizationService authorizationService;
+    private final AuthorizationService authorizationService;
+    private final ActivationService activationService;
 
     @Autowired
-    public AuthenticationController(AuthorizationService authorizationService) {
+    public AuthenticationController(AuthorizationService authorizationService,
+                                    ActivationService activationService) {
         this.authorizationService = authorizationService;
+        this.activationService = activationService;
     }
 
     @PostMapping("/login")
@@ -31,5 +32,15 @@ public class AuthenticationController {
 
         String token = authorizationService.login(requestDTO).get("token");
         return new ResponseEntity<>(token, HttpStatus.OK);
+    }
+
+    @GetMapping("/confirm/{code}")
+    public String activate(@PathVariable(name = "code") String code) {
+        boolean isActivated = activationService.activateCode(code);
+        if (isActivated) {
+            return "User successfully activated";
+        } else {
+            return "Activation code is invalid!";
+        }
     }
 }

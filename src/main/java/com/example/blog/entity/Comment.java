@@ -1,5 +1,6 @@
 package com.example.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -22,11 +23,11 @@ public class Comment {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
@@ -57,6 +58,7 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
+    @JsonIgnore
     public User getUser() {
         return user;
     }
@@ -65,6 +67,7 @@ public class Comment {
         this.user = user;
     }
 
+    @JsonIgnore
     public Article getArticle() {
         return article;
     }
