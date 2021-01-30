@@ -2,6 +2,8 @@ package com.example.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import javax.validation.constraints.NotBlank;
+
 public enum Status {
 
     PUBLIC("PUBLIC"), DRAFT("DRAFT");

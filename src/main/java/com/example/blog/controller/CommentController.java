@@ -4,10 +4,12 @@ import com.example.blog.dto.CommentDTO;
 import com.example.blog.service.CommentService;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,7 @@ public class CommentController {
     }
 
     @PostMapping(value = "/{articleId}/comments")
-    public ResponseEntity<CommentDTO> saveArticle(@RequestBody CommentDTO commentDTO,
+    public ResponseEntity<CommentDTO> saveArticle(@Valid @RequestBody CommentDTO commentDTO,
                                                   @PathVariable(value = "articleId") Long articleId) {
         Long userId = userService.getLoggedInUserId();
         return new ResponseEntity<>(CommentDTO.fromComment(commentService.saveComment(commentDTO, articleId, userId)),
@@ -51,5 +53,19 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @GetMapping(value = "/comments")
+    public ResponseEntity<Page<CommentDTO>> getAllArticles(
+            @RequestParam(defaultValue = "0") Integer skip,
+            @RequestParam(defaultValue = "10") Integer limit,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "asc") String order)
+    {
+
+        Page<CommentDTO> commentPage = commentService.getCommentPage(skip, limit, sort, order)
+                .map(CommentDTO::fromComment);
+
+        return new ResponseEntity<>(commentPage, HttpStatus.OK);
     }
 }

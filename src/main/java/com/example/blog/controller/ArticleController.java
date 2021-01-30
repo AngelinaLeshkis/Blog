@@ -49,7 +49,7 @@ public class ArticleController {
     }
 
     @PutMapping(value = "/updateArticle/{id}")
-    public ResponseEntity<Article> updateArticle(@RequestBody ArticleDTO articleDTO,
+    public ResponseEntity<Article> updateArticle(@Valid @RequestBody ArticleDTO articleDTO,
                                                  @PathVariable (name = "id") Long id) {
         Long userId = userService.getLoggedInUserId();
 

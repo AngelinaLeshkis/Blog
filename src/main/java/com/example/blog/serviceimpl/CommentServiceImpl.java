@@ -9,6 +9,10 @@ import com.example.blog.persistence.CommentRepository;
 import com.example.blog.persistence.UserRepository;
 import com.example.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,5 +79,21 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id" + id));
         return CommentDTO.fromComment(comment);
+    }
+
+    @Override
+    public Page<Comment> getCommentPage(Integer skip, Integer limit, String fieldName, String order) {
+        Sort resultSort = Sort.by(getSortOrder(order, fieldName));
+        Pageable pageInfo = PageRequest.of(skip, limit, resultSort);
+        return commentRepository.findAll(pageInfo);
+    }
+
+    private Sort.Order getSortOrder(String order, String fieldName) {
+        if ("asc".equalsIgnoreCase(order)) {
+            return Sort.Order.asc(fieldName);
+        } else if ("desc".equalsIgnoreCase(order)) {
+            return Sort.Order.desc(fieldName);
+        }
+        throw new RuntimeException("The order = " + order + " is invalid.");
     }
 }

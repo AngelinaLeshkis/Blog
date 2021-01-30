@@ -4,6 +4,7 @@ import com.example.blog.dto.AuthenticationRequestDTO;
 import com.example.blog.dto.UserDTO;
 import com.example.blog.entity.Role;
 import com.example.blog.entity.User;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.persistence.UserRepository;
 import com.example.blog.security.JwtUser;
 import com.example.blog.service.UserService;
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userRepo.findById(id).orElseThrow(() ->
-                new RuntimeException("User not found with id = " + id));
+                new BusinessException("User not found with id = " + id));
     }
 
     @Override

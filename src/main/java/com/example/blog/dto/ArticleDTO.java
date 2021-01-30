@@ -2,6 +2,7 @@ package com.example.blog.dto;
 
 import com.example.blog.entity.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ public class ArticleDTO {
     private String title;
     private String text;
     private Status status;
+    private Date createdAt;
+    private Date updatedAt;
     private Long userId;
     private Set<Tag> tags;
     private List<Comment> comments;
@@ -18,13 +21,16 @@ public class ArticleDTO {
     public ArticleDTO() {
     }
 
-    public ArticleDTO(Long id, String title, String text, Status status, Long userId, Set<Tag> tags) {
+    public ArticleDTO(Long id, String title, String text, Status status, Long userId, Set<Tag> tags,
+                      Date createdAt, Date updatedAt) {
         this.id = id;
         this.title = title;
         this.text = text;
         this.status = status;
         this.userId = userId;
         this.tags = tags;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Article toArticle(User user) {
@@ -48,6 +54,8 @@ public class ArticleDTO {
         articleDTO.setUserId(article.getUser().getId());
         articleDTO.setTags(article.getTags());
         articleDTO.setComments(article.getComments());
+        articleDTO.setCreatedAt(article.getCreatedAt());
+        articleDTO.setUpdatedAt(article.getUpdatedAt());
 
         return articleDTO;
     }
@@ -106,5 +114,21 @@ public class ArticleDTO {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

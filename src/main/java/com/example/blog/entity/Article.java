@@ -3,11 +3,12 @@ package com.example.blog.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -34,10 +35,9 @@ public class Article {
             updatable = false)
     private Date createdAt;
 
-    @CreationTimestamp
+    @LastModifiedDate
     @Column(name = "updated_at",
-            nullable = false,
-            updatable = false)
+            nullable = false)
     private Date updatedAt;
 
     @Column(name = "status",
