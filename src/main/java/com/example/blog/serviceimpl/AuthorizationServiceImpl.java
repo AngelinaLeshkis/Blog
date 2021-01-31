@@ -2,6 +2,7 @@ package com.example.blog.serviceimpl;
 
 import com.example.blog.dto.AuthenticationRequestDTO;
 import com.example.blog.entity.User;
+import com.example.blog.persistence.UserRepository;
 import com.example.blog.security.JwtTokenProvider;
 import com.example.blog.service.AuthorizationService;
 import com.example.blog.service.UserService;
@@ -21,14 +22,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
     public AuthorizationServiceImpl(AuthenticationManager authenticationManager,
-                                    JwtTokenProvider jwtTokenProvider, UserService userService) {
+                                    JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -37,11 +38,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             String email = authenticationRequestDTO.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,
                     authenticationRequestDTO.getPassword()));
-            User user = userService.getUserByEmail(email);
-
-            if (user == null) {
-                throw new UsernameNotFoundException("User with email: " + email + " not found");
-            }
+            User user = userRepository.findUserByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
 
             String token = jwtTokenProvider.createToken(email, user.getRole().getValueOfRole());
             Map<String, String> response = new HashMap<>();

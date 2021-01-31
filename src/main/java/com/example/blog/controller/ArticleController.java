@@ -1,7 +1,7 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.ArticleDTO;
-import com.example.blog.entity.Article;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.service.ArticleService;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +27,14 @@ public class ArticleController {
     }
 
     @PostMapping(value = "/addArticle")
-    public ResponseEntity<Article> saveArticle(@Valid @RequestBody ArticleDTO articleDTO) {
+    public ResponseEntity<String> saveArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         Long userId = userService.getLoggedInUserId();
-        return new ResponseEntity<>(articleService.saveArticle(articleDTO, userId), HttpStatus.OK);
+        try {
+            articleService.saveArticle(articleDTO, userId);
+            return new ResponseEntity<>("Article saved successfully", HttpStatus.OK);
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @GetMapping(value = "/allPublicArticles")
@@ -49,21 +54,29 @@ public class ArticleController {
     }
 
     @PutMapping(value = "/updateArticle/{id}")
-    public ResponseEntity<Article> updateArticle(@Valid @RequestBody ArticleDTO articleDTO,
-                                                 @PathVariable (name = "id") Long id) {
+    public ResponseEntity<String> updateArticle(@Valid @RequestBody ArticleDTO articleDTO,
+                                                @PathVariable(name = "id") Long id) {
         Long userId = userService.getLoggedInUserId();
-
-        return new ResponseEntity<>(articleService.updateArticle(id, articleDTO, userId), HttpStatus.OK);
+        try {
+            articleService.updateArticle(id, articleDTO, userId);
+            return new ResponseEntity<>("The article is updated successfully", HttpStatus.OK);
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>("The article can`t de updated!", HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @DeleteMapping(value = "/deleteArticle/{id}")
-    public ResponseEntity<Object> deleteArticle(@PathVariable (name = "id") Long id) {
+    public ResponseEntity<String> deleteArticle(@PathVariable(name = "id") Long id) {
         Long userId = userService.getLoggedInUserId();
-
-        if (articleService.deleteArticle(id, userId)) {
-            return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            if (articleService.deleteArticle(id, userId)) {
+                return new ResponseEntity<>("The article was successfully deleted!", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("The article can`t be deleted", HttpStatus.NOT_ACCEPTABLE);
+            }
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
     @GetMapping(value = "")
@@ -72,17 +85,13 @@ public class ArticleController {
     }
 
     @GetMapping(value = "/page")
-    public ResponseEntity<Page<ArticleDTO>> getAllArticles(
+    public Page<ArticleDTO> getAllArticles(
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "10") Integer limit,
             @RequestParam(defaultValue = "id") String sort,
-            @RequestParam(defaultValue = "asc") String order)
-    {
-
-        Page<ArticleDTO> articlePage = articleService.getArticlePage(skip, limit, sort, order)
+            @RequestParam(defaultValue = "asc") String order) {
+        return articleService.getArticlePage(skip, limit, sort, order)
                 .map(ArticleDTO::fromArticle);
-
-        return new ResponseEntity<>(articlePage, HttpStatus.OK);
     }
 
 }

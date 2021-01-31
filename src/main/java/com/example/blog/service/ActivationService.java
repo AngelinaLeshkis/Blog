@@ -4,4 +4,6 @@ public interface ActivationService {
 
     boolean activateCode(String token);
 
+    boolean isActivated();
+
 }

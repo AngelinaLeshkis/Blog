@@ -4,6 +4,7 @@ import com.example.blog.dto.CommentDTO;
 import com.example.blog.entity.Article;
 import com.example.blog.entity.Comment;
 import com.example.blog.entity.User;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.persistence.ArticleRepository;
 import com.example.blog.persistence.CommentRepository;
 import com.example.blog.persistence.UserRepository;
@@ -37,11 +38,10 @@ public class CommentServiceImpl implements CommentService {
     public Comment saveComment(CommentDTO commentDTO, Long articleId, Long userId) {
 
         User authorizedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+                .orElseThrow(() -> new BusinessException("User " + userId));
 
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException(("Article not found with id" + articleId)));
-
+                .orElseThrow(() -> new BusinessException(("Article " + articleId)));
 
         return commentRepository.save(commentDTO.toComment(article, authorizedUser));
     }
@@ -56,17 +56,17 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public boolean deleteComment(Long id, Long userId, Long articleId) {
         User articleOwner = userRepository.findById(articleRepository.findUserIdById(articleId))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         User authorizedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+                .orElseThrow(() -> new BusinessException("User " + userId));
 
         User commentOwner = userRepository.findById(commentRepository.findUserIdById(id))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         if (articleOwner.equals(authorizedUser) || commentOwner.equals(authorizedUser)) {
             commentRepository.delete(commentRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Comment not found with id " + id)));
+                    .orElseThrow(() -> new BusinessException("Comment " + id)));
 
             return true;
         }
@@ -77,7 +77,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDTO getCommentByCommentId(Long id) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id" + id));
+                .orElseThrow(() -> new BusinessException("Comment " + id));
         return CommentDTO.fromComment(comment);
     }
 

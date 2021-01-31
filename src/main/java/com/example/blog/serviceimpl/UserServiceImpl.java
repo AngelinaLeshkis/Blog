@@ -10,10 +10,12 @@ import com.example.blog.security.JwtUser;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,10 +32,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
-        User userFromDB = userRepo.findUserByEmail(user.getEmail());
+        Optional<User> userFromDB = userRepo.findUserByEmail(user.getEmail());
 
-        if (userFromDB != null) {
-            return null;
+        if (userFromDB.isPresent()) {
+            throw new BusinessException("User with email" + user.getEmail() + " has already existed!");
         }
 
         user.setRole(Role.USER);
@@ -50,28 +52,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
-        return userRepo.findById(id).orElseThrow(() ->
-                new BusinessException("User not found with id = " + id));
+    public UserDTO getUserById(Long id) {
+        return userRepo.findById(id)
+                .map(UserDTO::fromUser)
+                .orElseThrow(() -> new BusinessException("User", id));
     }
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepo.findUserByEmail(email);
+        return userRepo.findUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email " + email));
     }
 
     @Override
     public User setNewPassword(AuthenticationRequestDTO authenticationRequestDTO) {
-        User userFromDB = userRepo.findUserByEmail(authenticationRequestDTO.getEmail());
+        User userFromDB = userRepo.findUserByEmail(authenticationRequestDTO.getEmail())
+                .orElseThrow(() -> new BusinessException("User not found with email " +
+                        authenticationRequestDTO.getEmail()));
 
-        if (userFromDB == null) {
-            return null;
+        if (userFromDB.isEnabled()) {
+            userFromDB.setPassword(passwordEncoder.encode(authenticationRequestDTO.getPassword()));
+            userRepo.save(userFromDB);
+            return userFromDB;
+        } else {
+
+            throw new BusinessException("This operation is not available!");
         }
 
-        userFromDB.setPassword(passwordEncoder.encode(authenticationRequestDTO.getPassword()));
-        userRepo.save(userFromDB);
-
-        return userFromDB;
     }
 
     @Override

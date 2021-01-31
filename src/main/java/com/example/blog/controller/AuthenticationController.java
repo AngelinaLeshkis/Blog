@@ -1,11 +1,13 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.AuthenticationRequestDTO;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.service.ActivationService;
 import com.example.blog.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,21 +28,25 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody AuthenticationRequestDTO requestDTO) {
-        if (authorizationService.login(requestDTO) == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        String token = authorizationService.login(requestDTO).get("token");
-        return new ResponseEntity<>(token, HttpStatus.OK);
+       try {
+           String token = authorizationService.login(requestDTO).get("token");
+           return new ResponseEntity<>(token, HttpStatus.OK);
+        } catch (UsernameNotFoundException ex) {
+           return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+       }
     }
 
     @GetMapping("/confirm/{code}")
     public String activate(@PathVariable(name = "code") String code) {
-        boolean isActivated = activationService.activateCode(code);
-        if (isActivated) {
-            return "User successfully activated";
-        } else {
-            return "Activation code is invalid!";
+        try {
+            boolean isActivated = activationService.activateCode(code);
+            if (isActivated) {
+                return "User successfully activated";
+            } else {
+                return "Activation code is invalid!";
+            }
+        } catch (BusinessException ex) {
+            return "User not found!";
         }
     }
 }

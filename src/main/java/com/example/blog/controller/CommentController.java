@@ -1,6 +1,7 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.CommentDTO;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.service.CommentService;
 import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,46 +27,56 @@ public class CommentController {
     }
 
     @PostMapping(value = "/{articleId}/comments")
-    public ResponseEntity<CommentDTO> saveArticle(@Valid @RequestBody CommentDTO commentDTO,
-                                                  @PathVariable(value = "articleId") Long articleId) {
+    public ResponseEntity<String> saveArticle(@Valid @RequestBody CommentDTO commentDTO,
+                                              @PathVariable(value = "articleId") Long articleId) {
         Long userId = userService.getLoggedInUserId();
-        return new ResponseEntity<>(CommentDTO.fromComment(commentService.saveComment(commentDTO, articleId, userId)),
-                HttpStatus.OK);
+        try {
+            CommentDTO.fromComment(commentService.saveComment(commentDTO, articleId, userId));
+            return new ResponseEntity<>("Comment saved successfully", HttpStatus.OK);
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @GetMapping(value = "/{articleId}/comments/{id}")
     public ResponseEntity<CommentDTO> getCommentById(@PathVariable(value = "id") Long id) {
-        return new ResponseEntity<>(commentService.getCommentByCommentId(id), HttpStatus.OK);
+        try {
+            CommentDTO savedComment = commentService.getCommentByCommentId(id);
+            return new ResponseEntity<>(savedComment, HttpStatus.OK);
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
     @GetMapping(value = "/{articleId}/comments")
-    public ResponseEntity<List<CommentDTO>> getCommentByArticleId(@PathVariable(value = "articleId")
-                                                                              Long articleId) {
-        return new ResponseEntity<>(commentService.getCommentsByArticleId(articleId), HttpStatus.OK);
+    public List<CommentDTO> getCommentByArticleId(@PathVariable(value = "articleId")
+                                                                          Long articleId) {
+        return commentService.getCommentsByArticleId(articleId);
     }
 
     @DeleteMapping(value = "/{articleId}/comments/{id}")
-    public ResponseEntity<Object> deleteArticle(@PathVariable (name = "articleId") Long articleId,
-                                                @PathVariable (name = "id") Long id) {
+    public ResponseEntity<Object> deleteArticle(@PathVariable(name = "articleId") Long articleId,
+                                                @PathVariable(name = "id") Long id) {
         Long userId = userService.getLoggedInUserId();
-
-        if (commentService.deleteComment(id, userId, articleId)) {
-            return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            if (commentService.deleteComment(id, userId, articleId)) {
+                return new ResponseEntity<>("Comment was deleted successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Comment can`t be deleted", HttpStatus.NOT_ACCEPTABLE);
+            }
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
     @GetMapping(value = "/comments")
-    public ResponseEntity<Page<CommentDTO>> getAllArticles(
+    public Page<CommentDTO> getAllArticles(
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "10") Integer limit,
             @RequestParam(defaultValue = "id") String sort,
-            @RequestParam(defaultValue = "asc") String order)
-    {
+            @RequestParam(defaultValue = "asc") String order) {
 
-        Page<CommentDTO> commentPage = commentService.getCommentPage(skip, limit, sort, order)
+        return commentService.getCommentPage(skip, limit, sort, order)
                 .map(CommentDTO::fromComment);
-
-        return new ResponseEntity<>(commentPage, HttpStatus.OK);
     }
 }

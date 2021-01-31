@@ -10,9 +10,9 @@ import java.util.Set;
 
 public interface ArticleService {
 
-    Article saveArticle(ArticleDTO articleDTO, Long userId);
+    void saveArticle(ArticleDTO articleDTO, Long userId);
 
-    Article updateArticle(Long id, ArticleDTO articleDTO, Long userId);
+    void updateArticle(Long id, ArticleDTO articleDTO, Long userId);
 
     List<ArticleDTO> getAllPublicArticles();
 

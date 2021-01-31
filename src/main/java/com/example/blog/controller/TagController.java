@@ -1,8 +1,11 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.TagDTO;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,8 +25,13 @@ public class TagController {
     }
 
     @GetMapping(value = "/tags/tags-cloud")
-    public Map<String, Integer> getArticlesCountByTag(@RequestParam(value = "tag") String tag) {
-        return tagService.getArticlesCountByTag(tag);
+    public ResponseEntity<Map<String, Integer>> getArticlesCountByTag(@RequestParam(value = "tag") String tag) {
+        try {
+            Map<String, Integer> articlesCount = tagService.getArticlesCountByTag(tag);
+            return new ResponseEntity<>(articlesCount, HttpStatus.OK);
+        } catch (BusinessException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(value = "/tags-cloud")

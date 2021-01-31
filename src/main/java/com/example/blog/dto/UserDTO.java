@@ -4,6 +4,7 @@ import com.example.blog.entity.Article;
 import com.example.blog.entity.User;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public class UserDTO implements Serializable {
@@ -12,17 +13,8 @@ public class UserDTO implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
+    private Date createdAt;
     private List<Article> articles;
-
-//    public User toUser() {
-//        User user = new User();
-//        user.setId(id);
-//        user.setEmail(email);
-//        user.setFirstName(firstName);
-//        user.setLastName(lastName);
-//
-//        return user;
-//    }
 
     public static UserDTO fromUser(User user) {
         UserDTO userDTO = new UserDTO();
@@ -31,20 +23,10 @@ public class UserDTO implements Serializable {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setArticles(user.getArticles());
+        userDTO.setCreatedAt(user.getCreatedAt());
 
         return userDTO;
     }
-
-//    public static UserDTO fromDBUser(User user) {
-//        UserDTO userDTO = new UserDTO();
-//        userDTO.setId(user.getId());
-//        userDTO.setEmail(user.getEmail());
-//        userDTO.setFirstName(user.getFirstName());
-//        userDTO.setLastName(user.getLastName());
-//        userDTO.setArticles(user.getArticles());
-//
-//        return userDTO;
-//    }
 
     public Long getId() {
         return id;
@@ -84,5 +66,13 @@ public class UserDTO implements Serializable {
 
     public void setArticles(List<Article> articles) {
         this.articles = articles;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

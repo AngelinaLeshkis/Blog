@@ -2,6 +2,7 @@ package com.example.blog.serviceimpl;
 
 import com.example.blog.dto.TagDTO;
 import com.example.blog.entity.Tag;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.persistence.TagRepository;
 import com.example.blog.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class TagServiceImpl implements TagService {
         Tag tagFromDB = tagRepository.findByName(tagName);
 
         if (tagFromDB == null) {
-            return null;
+            throw new BusinessException("Tag not found");
         }
 
         tagWithArticleCount.put(tagName, tagFromDB.getArticles().size());

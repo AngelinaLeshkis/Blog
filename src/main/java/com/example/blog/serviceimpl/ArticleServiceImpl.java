@@ -4,6 +4,7 @@ import com.example.blog.dto.ArticleDTO;
 import com.example.blog.entity.Article;
 import com.example.blog.entity.Tag;
 import com.example.blog.entity.User;
+import com.example.blog.exception.BusinessException;
 import com.example.blog.persistence.ArticleRepository;
 import com.example.blog.persistence.TagRepository;
 import com.example.blog.persistence.UserRepository;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,52 +37,38 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article saveArticle(ArticleDTO articleDTO, Long userId) {
+    public void saveArticle(ArticleDTO articleDTO, Long userId) {
         User authorizedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
-
-        if (authorizedUser == null) {
-            return null;
-        }
+                .orElseThrow(() -> new BusinessException("User " + userId));
 
         setExistedTagsFromDB(articleDTO);
 
-        return articleRepository.save(articleDTO.toArticle(authorizedUser));
+        articleRepository.save(articleDTO.toArticle(authorizedUser));
     }
 
     @Override
-    public Article updateArticle(Long id, ArticleDTO articleDTO, Long userId) {
-
+    public void updateArticle(Long id, ArticleDTO articleDTO, Long userId) {
         User userFromDB = userRepository.findById(articleRepository.findUserIdById(id))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         User authorizedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+                .orElseThrow(() -> new BusinessException("User " + userId));
 
-        if (!userFromDB.equals(authorizedUser)) {
-            return null;
+        if (userFromDB.equals(authorizedUser)) {
+            setExistedTagsFromDB(articleDTO);
+            articleDTO.setId(id);
+            articleRepository.save(articleDTO.toArticle(authorizedUser));
         }
-
-        setExistedTagsFromDB(articleDTO);
-        articleDTO.setId(id);
-
-        return articleRepository.save(articleDTO.toArticle(authorizedUser));
     }
 
     @Override
     public List<ArticleDTO> getAllPublicArticles() {
-        return articleRepository.findAll().stream()
-                .filter(article -> "PUBLIC".equals(article.getStatus().getValueOfStatus()))
-                .map(ArticleDTO::fromArticle)
-                .collect(Collectors.toList());
+        return filterArticles(articleRepository.findAll());
     }
 
     @Override
     public List<ArticleDTO> getAllPublicArticlesByUserId(Long id) {
-        return articleRepository.findAllByUserId(id).stream()
-                .filter(article -> "PUBLIC".equals(article.getStatus().getValueOfStatus()))
-                .map(ArticleDTO::fromArticle)
-                .collect(Collectors.toList());
+        return filterArticles(articleRepository.findAllByUserId(id));
     }
 
     @Override
@@ -106,15 +92,15 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public boolean deleteArticle(Long id, Long userId) {
         User userFromDB = userRepository.findById(articleRepository.findUserIdById(id))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         User authorizedUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+                .orElseThrow(() -> new BusinessException("User " + userId));
 
         if (userFromDB.equals(authorizedUser)) {
 
             articleRepository.delete(articleRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Article not found with id " + id)));
+                    .orElseThrow(() -> new BusinessException("Article " + id)));
 
             return true;
         }
@@ -129,6 +115,13 @@ public class ArticleServiceImpl implements ArticleService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<Article> getArticlePage(Integer skip, Integer limit, String fieldName, String order) {
+        Sort resultSort = Sort.by(getSortOrder(order, fieldName));
+        Pageable pageInfo = PageRequest.of(skip, limit, resultSort);
+        return articleRepository.findAll(pageInfo);
+    }
+
     private void setExistedTagsFromDB(ArticleDTO articleDTO) {
         for (Tag tag : articleDTO.getTags()) {
             Tag existedTag = tagRepository.findByName(tag.getName());
@@ -140,13 +133,6 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
-    @Override
-    public Page<Article> getArticlePage(Integer skip, Integer limit, String fieldName, String order) {
-        Sort resultSort = Sort.by(getSortOrder(order, fieldName));
-        Pageable pageInfo = PageRequest.of(skip, limit, resultSort);
-        return articleRepository.findAll(pageInfo);
-    }
-
     private Sort.Order getSortOrder(String order, String fieldName) {
         if ("asc".equalsIgnoreCase(order)) {
             return Sort.Order.asc(fieldName);
@@ -155,4 +141,12 @@ public class ArticleServiceImpl implements ArticleService {
         }
         throw new RuntimeException("The order = " + order + " is invalid.");
     }
+
+    private List<ArticleDTO> filterArticles(List<Article> articles) {
+        return articles.stream()
+                .filter(article -> "PUBLIC".equals(article.getStatus().getValueOfStatus()))
+                .map(ArticleDTO::fromArticle)
+                .collect(Collectors.toList());
+    }
+
 }

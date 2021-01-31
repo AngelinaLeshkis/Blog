@@ -12,7 +12,7 @@ public interface UserService {
 
     List<UserDTO> getUsers();
 
-    User getUserById(Long id);
+    UserDTO getUserById(Long id);
 
     User getUserByEmail(String email);
 
