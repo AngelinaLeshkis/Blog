@@ -18,7 +18,7 @@ public class Comment {
     private Long id;
 
     @NotBlank(message = "Message cannot be missing or empty")
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     @CreationTimestamp

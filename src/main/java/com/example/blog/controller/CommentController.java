@@ -50,7 +50,7 @@ public class CommentController {
 
     @GetMapping(value = "/{articleId}/comments")
     public List<CommentDTO> getCommentByArticleId(@PathVariable(value = "articleId")
-                                                                          Long articleId) {
+                                                          Long articleId) {
         return commentService.getCommentsByArticleId(articleId);
     }
 

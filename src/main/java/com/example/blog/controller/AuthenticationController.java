@@ -28,12 +28,12 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody AuthenticationRequestDTO requestDTO) {
-       try {
-           String token = authorizationService.login(requestDTO).get("token");
-           return new ResponseEntity<>(token, HttpStatus.OK);
+        try {
+            String token = authorizationService.login(requestDTO).get("token");
+            return new ResponseEntity<>(token, HttpStatus.OK);
         } catch (UsernameNotFoundException ex) {
-           return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
-       }
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/confirm/{code}")

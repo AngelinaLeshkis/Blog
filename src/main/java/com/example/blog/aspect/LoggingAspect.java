@@ -3,7 +3,9 @@ package com.example.blog.aspect;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -14,10 +16,11 @@ public class LoggingAspect {
     private String email;
 
     @Pointcut("execution(* com.example.blog.security.JwtUserDetailsService.loadUserByUsername(*))")
-    public void checkRole(){}
+    public void checkRole() {
+    }
 
     @Pointcut("execution(* com.example.blog.security.JwtUserDetailsService.loadUserByUsername(String)) && args(email)")
-    public void checkEmailArg(String email){
+    public void checkEmailArg(String email) {
 
     }
 

@@ -20,7 +20,7 @@ public class CommentDTO {
 
     }
 
-    public CommentDTO(Long id, String message,  String firstName,Date createdAt,
+    public CommentDTO(Long id, String message, String firstName, Date createdAt,
                       String lastName, Long articleId, Long userId) {
         this.id = id;
         this.message = message;

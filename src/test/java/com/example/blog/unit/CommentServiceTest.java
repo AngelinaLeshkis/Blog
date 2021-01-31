@@ -1,7 +1,6 @@
 package com.example.blog.unit;
 
 import com.example.blog.dto.CommentDTO;
-import com.example.blog.entity.Comment;
 import com.example.blog.persistence.CommentRepository;
 import org.junit.Assert;
 import org.junit.Test;

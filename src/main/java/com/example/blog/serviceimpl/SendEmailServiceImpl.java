@@ -9,8 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.transaction.Transactional;
-
 @Service
 public class SendEmailServiceImpl implements SendEmailService {
 
@@ -45,7 +43,7 @@ public class SendEmailServiceImpl implements SendEmailService {
                     token
 
             );
-           sendEmail(user.getEmail(), message, "Activation code");
+            sendEmail(user.getEmail(), message, "Activation code");
         }
     }
 

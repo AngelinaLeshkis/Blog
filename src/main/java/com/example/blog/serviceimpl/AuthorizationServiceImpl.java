@@ -5,7 +5,6 @@ import com.example.blog.entity.User;
 import com.example.blog.persistence.UserRepository;
 import com.example.blog.security.JwtTokenProvider;
 import com.example.blog.service.AuthorizationService;
-import com.example.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

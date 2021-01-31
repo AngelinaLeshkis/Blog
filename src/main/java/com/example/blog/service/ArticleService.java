@@ -2,11 +2,9 @@ package com.example.blog.service;
 
 import com.example.blog.dto.ArticleDTO;
 import com.example.blog.entity.Article;
-import com.example.blog.entity.Tag;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ArticleService {
 

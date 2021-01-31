@@ -19,12 +19,12 @@ public class RedisRepositoryImpl implements RedisRepository {
     private HashOperations hashOperations;
 
     @Autowired
-    public RedisRepositoryImpl(RedisTemplate<Long, String> redisTemplate){
+    public RedisRepositoryImpl(RedisTemplate<Long, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         hashOperations = redisTemplate.opsForHash();
     }
 
