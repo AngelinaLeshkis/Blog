@@ -5,6 +5,8 @@ import com.example.blog.persistence.RedisRepository;
 import com.example.blog.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -17,6 +19,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String createVerificationToken(User user) {
         return redisRepository.createVerificationTokenForUser(user);
     }

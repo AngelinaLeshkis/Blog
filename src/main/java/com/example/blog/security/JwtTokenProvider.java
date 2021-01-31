@@ -22,8 +22,6 @@ import java.util.List;
 @Component
 public class JwtTokenProvider {
 
-    private static final Logger logger = LogManager.getLogger(JwtTokenProvider.class);
-
     @Value("${jwt.token.secret}")
     private String secret;
 
@@ -46,8 +44,6 @@ public class JwtTokenProvider {
 
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", getRoleName(userRole));
-        logger.info(getRoleName(userRole));
-
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -74,7 +70,6 @@ public class JwtTokenProvider {
         if (bearerToken != null && bearerToken.startsWith("Bearer_")) {
             return bearerToken.substring(7, bearerToken.length());
         }
-        logger.info(bearerToken);
 
         return null;
     }
