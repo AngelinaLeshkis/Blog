@@ -122,6 +122,11 @@ public class ArticleServiceImpl implements ArticleService {
         return articleRepository.findAll(pageInfo);
     }
 
+    @Override
+    public List<ArticleDTO> getArticlesByTitle(String title) {
+        return filterArticles(articleRepository.findAllByTitleContains(title));
+    }
+
     private void setExistedTagsFromDB(ArticleDTO articleDTO) {
         for (Tag tag : articleDTO.getTags()) {
             Tag existedTag = tagRepository.findByName(tag.getName());

@@ -36,6 +36,12 @@ public class CommentDTO {
         this.message = message;
     }
 
+    public CommentDTO(String message, Long articleId, Long userId) {
+        this.message = message;
+        this.articleId = articleId;
+        this.userId = userId;
+    }
+
     public Comment toComment(Article article, User user) {
         Comment comment = new Comment();
         comment.setId(id);

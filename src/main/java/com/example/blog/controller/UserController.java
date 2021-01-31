@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
+@RequestMapping(value = "/auth")
 public class UserController {
 
     private final UserService userService;
@@ -38,17 +39,6 @@ public class UserController {
 
         } catch (BusinessException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
-    }
-
-    @GetMapping(value = "/user/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable(name = "id") Long id) {
-        try {
-            UserDTO user = userService.getUserById(id);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-
-        } catch (BusinessException ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

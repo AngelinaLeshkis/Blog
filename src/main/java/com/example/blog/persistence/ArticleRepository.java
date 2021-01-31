@@ -19,4 +19,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query(value = "SELECT user_id FROM article WHERE id = ?", nativeQuery = true)
     Long findUserIdById(Long id);
+
+    List<Article> findAllByTitleContains(String title);
 }

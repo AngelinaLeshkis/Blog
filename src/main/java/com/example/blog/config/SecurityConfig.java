@@ -37,10 +37,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers( "/auth/**", "/registration/**", "/articles/allPublicArticles",
-                        "/articles/allPublicArticles/{id}", "/tags/**", "/tags-cloud").permitAll()
-                .antMatchers("/user/**", "/articles/**").hasRole("USER")
-                .antMatchers( "/user/**").hasRole("ADMIN")
+                .antMatchers( "/auth/**", "/articles/allPublicArticles",
+                        "/articles/allPublicArticles/{id}", "/tags/**", "/tags-cloud",
+                        "/articles", "/articles/page", "/articles/comments",
+                        "articles/{articleId}/comments", "articles/{articleId}/comments/{id}",
+                        "/articles/byTitle").permitAll()
+                .antMatchers( "/articles/addArticle", "/articles/allUserArticles",
+                        "/articles/updateArticle/**", "/articles/deleteArticle/**",
+                        "articles/{articleId}/comments", "/{articleId}/comments/{id}").hasRole("USER")
+                .antMatchers(  "/admin/**", "/articles/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));

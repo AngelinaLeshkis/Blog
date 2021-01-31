@@ -84,6 +84,11 @@ public class ArticleController {
         return articleService.getArticlesByTag(tags);
     }
 
+    @GetMapping(value = "/byTitle")
+    public List<ArticleDTO> getArticlesByTitle(@RequestParam String title) {
+        return articleService.getArticlesByTitle(title);
+    }
+
     @GetMapping(value = "/page")
     public Page<ArticleDTO> getAllArticles(
             @RequestParam(defaultValue = "0") Integer skip,

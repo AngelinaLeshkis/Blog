@@ -27,7 +27,7 @@ public class CommentController {
     }
 
     @PostMapping(value = "/{articleId}/comments")
-    public ResponseEntity<String> saveArticle(@Valid @RequestBody CommentDTO commentDTO,
+    public ResponseEntity<String> saveComment(@Valid @RequestBody CommentDTO commentDTO,
                                               @PathVariable(value = "articleId") Long articleId) {
         Long userId = userService.getLoggedInUserId();
         try {

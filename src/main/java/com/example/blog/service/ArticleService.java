@@ -22,6 +22,8 @@ public interface ArticleService {
 
     List<ArticleDTO> getAllArticlesByUserId(Long id);
 
+    List<ArticleDTO> getArticlesByTitle(String title);
+
     boolean deleteArticle(Long id, Long userId);
 
     Page<Article> getArticlePage(Integer skip, Integer limit, String fieldName, String order);
